@@ -3,6 +3,11 @@ DELETE FROM postac WHERE nazwa IN (
 	SELECT nazwa FROM postac WHERE id_postaci > 3 ORDER BY wiek DESC LIMIT 3 
 );
 
+SHOW CREATE table postac;
+ALTER TABLE postac DROP FOREIGN KEY postac_ibfk_1;
+ALTER TABLE walizka DROP FOREIGN KEY walizka_ibfk_1;
+ALTER TABLE przetwor DROP FOREIGN KEY przetwor_ibfk_1;
+
 ALTER TABLE `postac` DROP INDEX `nazwa_statku`; 
 
 ALTER TABLE `postac` CHANGE `id_postaci` `id_postaci` INT(11) NOT NULL; 
@@ -14,11 +19,45 @@ ALTER TABLE postac ADD pesel varchar(11);
 UPDATE postac SET pesel = '12345678901' WHERE nazwa = 'Bjorn';
 UPDATE postac SET pesel = '12345678902' WHERE nazwa = 'Drozd';
 UPDATE postac SET pesel = '02345678901' WHERE nazwa = 'Tesciowa';
-UPDATE postac SET pesel = '12345678903' WHERE nazwa = 'Wiking B';
-UPDATE postac SET pesel = '12345678904' WHERE nazwa = 'Wiking D';
-UPDATE postac SET pesel = '12345678905' WHERE nazwa = 'Wiking E';
+UPDATE postac SET pesel = '12345678903' WHERE nazwa = 'Wiking_A';
+UPDATE postac SET pesel = '12345678904' WHERE nazwa = 'Wiking_B';
+UPDATE postac SET pesel = '12345678905' WHERE nazwa = 'Wiking_C';
 ALTER TABLE postac ADD PRIMARY KEY(pesel);
 
 ALTER TABLE postac MODIFY COLUMN rodzaj ENUM('wiking', 'ptak', 'kobieta', 'syrena');
 
 INSERT INTO postac VALUES('Gertruda Nieszczera', 'syrena', '879-12-02', 246, NULL, NULL, '00000001127');
+
+zad 2.3
+UPDATE postac SET nazwa_statku = 'Dar Pomorza' WHERE nazwa LIKE '%a%';
+
+UPDATE statki SET max_ladownosc = max_ladownosc * 0.7 WHERE data_wodowania < '1901-01-01' AND data_wodowania > '1800-01-01';
+
+ ALTER TABLE postac ADD CHECK (wiek <= 1000);
+
+zad 2.4
+INSERT INTO postac(pesel, nazwa) VALUES ('00000000000','Loko'); 
+
+SHOW CREATE TABLE marynarz;
+
+INSERT INTO marynarz SELECT * FROM postac WHERE nazwa_statku IS NOT NULL;
+ ALTER TABLE marynarz ADD FOREIGN KEY (nazwa_statku) REFERENCES  statki(nazwa_statku);
+
+zad 2.5
+UPDATE postac SET nazwa_statku = NULL;
+
+DELETE FROM postac WHERE rodzaj = 'wiking' AND funkcja IS NULL LIMIT 1;
+
+ALTER TABLE marynarz DROP CONSTRAINT marynarz_ibfk_1;
+DELETE FROM statki;
+
+DROP TABLE statki;
+
+CREATE TABLE zwierz(
+id int PRIMARY KEY AUTO_INCREMENT,
+nazwa varchar(40),
+wiek int
+);
+
+INSERT INTO zwierz(nazwa, wiek)
+SELECT nazwa, wiek FROM postac WHERE rodzaj = 'ptak';
