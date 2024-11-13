@@ -1,0 +1,46 @@
+zad 1.1
+CREATE TABLE Postac (
+	id_postaci int AUTO_INCREMENT PRIMARY KEY,
+    nazwa varchar(40),
+    rodzaj ENUM('wiking', 'ptak', 'kobieta'),
+    data_ur date,
+    wiek int UNSIGNED
+);
+
+INSERT INTO postac VALUES(1, 'Bjorn', 'wiking', '1100-01-01', 25);
+INSERT INTO postac VALUES(2, 'Drozd', 'ptak', '1120-01-01', 5);
+INSERT INTO postac VALUES(3, 'Teściowa', 'kobieta', '1050-01-01', 75);
+
+UPDATE postac SET wiek = 88 WHERE id_postaci = 3;
+
+zad 1.5
+
+INSERT INTO postac(nazwa, rodzaj, data_ur, wiek) VALUES
+    ('Wiking A', 'wiking', '1105-01-01', 20),
+    ('Wiking B', 'wiking', '1105-01-01', 20),
+    ('Wiking C', 'wiking', '1105-01-01', 20),
+    ('Wiking D', 'wiking', '1105-01-01', 20),
+    ('Wiking E', 'wiking', '1105-01-01', 20);
+
+CREATE TABLE statki(
+    nazwa_statku varchar(40) PRIMARY KEY,
+    rodzaj_statku enum('maly', 'duzy'),
+    data_wodowania date,
+    max_ladownosc int UNSIGNED
+);
+
+INSERT INTO statki VALUES
+    ('Dar Młodzieży', 'maly', '1125-01-01', 5),
+    ('Dar Pomorza', 'duzy', '1125-01-01', 10);
+
+ALTER TABLE postac ADD funkcja varchar(80);
+
+UPDATE postac SET funkcja = 'kapitan' WHERE nazwa = 'Bjorn';
+
+ALTER TABLE postac ADD nazwa_statku varchar(40);
+ALTER TABLE postac ADD FOREIGN KEY (nazwa_statku) REFERENCES statki(nazwa_statku);
+
+UPDATE postac SET nazwa_statku = 'Dar Pomorza' WHERE id_postaci = 1 OR id_postaci = 2;
+UPDATE postac SET nazwa_statku = 'Dar Młodzieży' WHERE id_postaci > 3;
+
+DROP TABLE izba
