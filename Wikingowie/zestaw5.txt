@@ -1,0 +1,98 @@
+SELECT nazwa, AVG((waga*ilosc)/ilosc) FROM zasob 
+WHERE ilosc >= 4
+GROUP BY nazwa
+HAVING SUM(waga) > 10;
+
+5.1
+DELETE * FROM kreatura;
+INSERT INTO kreatura SELECT * FROM wikingowie.kretura;
+
+CREATE TABLE uczestnicy LIKE wikingowie.uczestnicy;
+INSERT INTO uczestnicy SELECT * FROM wikingowie.uczestnicy;
+
+CREATE TABLE etapy_wyprawy LIKE wikingowie.etapy_wyprawy;
+INSERT INTO etapy_wyprawy SELECT * FROM wikingowie.etapy_wyprawy;
+
+CREATE TABLE wyprawa LIKE wikingowie.wyprawa;
+INSERT INTO wyprawa SELECT * FROM wikingowie.wyprawa;
+
+CREATE TABLE sektor LIKE wikingowie.sektor;
+INSERT INTO sektor SELECT * FROM wikingowie.sektor;
+
+
+SELECT kreatura.nazwa FROM 
+uczestnicy RIGHT JOIN kreatura ON id_uczestnika = idKreatury
+WHERE id_wyprawy IS NULL;
+
+
+
+SELECT nazwa, SUM(ilosc) FROM uczestnicy
+LEFT JOIN wyprawa ON uczestnicy.id_wyprawy = wyprawa.id_wyprawy
+LEFT JOIN ekwipunek ON id_uczestnika = idKreatury
+GROUP BY nazwa;
+
+
+
+
+5.2
+SELECT wyprawa.nazwa as Wyprawa, 
+count(kreatura.idKreatury) as Ilosc, 
+GROUP_CONCAT(kreatura.nazwa) as Uczestnicyy 
+FROM uczestnicy
+LEFT JOIN wyprawa ON uczestnicy.id_wyprawy = wyprawa.id_wyprawy
+LEFT JOIN kreatura ON id_uczestnika = idKreatury
+GROUP BY wyprawa.nazwa;
+
+
+
+SELECT wyprawa.nazwa, sektor.nazwa, kreatura.nazwa, kolejnosc, data_rozpoczecia
+FROM wyprawa
+LEFT JOIN etapy_wyprawy ON idWyprawy = id_wyprawy
+LEFT JOIN sektor ON sektor
+INNER JOIN kreatura ON kierownik = idKreatury
+ORDER BY data_rozpoczecia, kolejnosc;
+
+
+
+5.3
+SELECT sektor, COUNT(sektor) FROM etapy_wyprawy
+GROUP BY sektor;
+
+SELECT nazwa, COUNT(sektor) as ilosc_odwiedzin  FROM etapy_wyprawy
+RIGHT JOIN sektor ON id_sektora = sektor
+GROUP BY nazwa
+ORDER BY ilosc_odwiedzin;
+
+
+
+5.4
+SELECT nazwa, SUM(LENGTH(dziennik)) FROM wyprawa
+INNER JOIN etapy_wyprawy ON id_wyprawy = idWyprawy
+GROUP BY nazwa
+HAVING SUM(LENGTH(dziennik)) < 400;
+
+SELECT (ekwipunek.ilosc * zasob.ilosc * waga) as calkowita_waga
+COUNT(id_kreatury)
+FROM uczestnicy
+INNER JOIN ekwipunek ON id_uczestnika = idKreatury
+INNER JOIN zasob ON ekwipunek.idZasobu = zasob.idZasobu
+GROUP BY id_wyprawy;
+
+SELECT id_wyprawy,
+(SUM(ekwipunek.ilosc * zasob.ilosc * waga)/COUNT(idKreatury))
+FROM uczestnicy
+INNER JOIN ekwipunek ON id_uczestnika = idKreatury
+INNER JOIN zasob ON ekwipunek.idZasobu = zasob.idZasobu
+GROUP BY id_wyprawy;
+
+5.5
+//id_sektora 7 = Chatka dziadka
+SELECT wyprawa.nazwa, kreatura.nazwa, data_rozpoczecia, dataUr,
+DATEDIFF(data_rozpoczecia, dataUr)
+FROM uczestnicy
+INNER JOIN wyprawa ON wyprawa.id_wyprawy = uczestnicy.id_wyprawy
+INNER JOIN kreatura ON idKreatury = uczestnicy.id_uczestnika
+WHERE uczestnicy.id_wyprawy IN (
+SELECT idWyprawy FROM etapy_wyprawy
+WHERE sektor = 7
+);
