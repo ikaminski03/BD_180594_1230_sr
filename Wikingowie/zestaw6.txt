@@ -1,0 +1,61 @@
+6.1
+delimiter $$
+CREATE TRIGGER waga_pozytywna_insert 
+BEFORE INSERT ON kreatura FOR EACH ROW
+BEGIN
+	IF new.waga <= 0
+	THEN signal sqlstate '45000';
+	END IF;
+END;$$
+
+CREATE TRIGGER waga_pozytywna_update
+BEFORE UPDATE ON kreatura FOR EACH ROW
+BEGIN
+	IF new.waga <= 0
+	THEN signal sqlstate '45000';
+	END IF;
+END;$$
+
+6.2 SYNTAX ERROR
+
+CREATE TABLE archiwum_wypraw (
+id_wyprawy int NOT NULL PRIMARY KEY,
+nazwa varchar(200),
+data_rozpoczecia date, 
+data_zakonczenia date, 
+kierownik varchar(47)
+);
+
+delimiter $$
+CREATE TRIGGER archiwizacja_wypraw
+BEFORE DELETE ON wyprawa FOR EACH ROW
+BEGIN
+	INSERT INTO archiwum_wypraw(id_wyprawy, nazwa, data_rozpoczecia, data_zakonczenia, kierownik) VALUES(
+		old.id_wyprawy,
+		old.nazwa, 
+		old.data_rozpoczecia,
+		old.data_zakonczenia,
+		SELECT nazwa FROM kreatura WHERE idKreatury = old.kierownik;
+	);
+END $$
+delimiter ;
+
+
+6.3 punkt 2 może być trochę zbyt śmieszny
+delimiter $$
+CREATE PROCEDURE eliksir_sily(IN id_kreatury INT)
+BEGIN
+	UPDATE kreatura SET udzwig = udzwig * 1.2 WHERE id_kreatury = idKreatury;
+END $$
+delimiter ;
+
+delimiter $$
+CREATE FUNCTION to_upper(input VARCHAR(256))
+RETURNS VARCHAR(256)
+DETERMINISTIC
+BEGIN
+	DECLARE output VARCHAR(256);
+	SET output = UPPER(input);
+	RETURN(output);
+END $$
+delimiter ;
