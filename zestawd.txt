@@ -1,0 +1,62 @@
+D1)
+
+CREATE TABLE pracownik(
+id INT auto_increment PRIMARY KEY,
+imie VARCHAR(50) NOT NULL,
+nazwisko VARCHAR(100) NOT NULL,
+data_urodzenia DATE,
+stanowisko ENUM('sprzedwaca', 'magazynier', 'ksigowa')
+);
+
+ALTER TABLE pracownik MODIFY COLUMN stanowisko ENUM('sprzedawca', 'magazynier', 'ksiegowa');
+
+D2)
+INSERT INTO pracownik(imie, nazwisko, data_urodzenia) VALUES('John', 'Fakejob', '2954-01-08');
+INSERT INTO pracownik VALUES(2, 'Tadeusz', 'Test', '3000-12-01', 'ksiegowa');
+INSERT INTO pracownik(imie, nazwisko, stanowisko) VALUES('Mephistoteles', 'The Ancient One', 'sprzedawca');
+
+UPDATE pracownik SET imie = 'Mephistopheles' WHERE nazwisko = 'The Ancient One';
+
+D3)
+CREATE TABLE dzial(id INT auto_increment PRIMARY KEY, nazwa VARCHAR(255));
+
+D4)
+INSERT INTO dzial(nazwa) VALUES('sprzedaz');
+INSERT INTO dzial(nazwa) VALUES('ksiegowosc');
+INSERT INTO dzial(nazwa) VALUES('magazyn');
+
+D5)
+ALTER TABLE pracownik MODIFY COLUMN stanowisko ENUM('sprzedawca', 'magazynier', 'ksiegowa') DEFAULT 'sprzedawca';
+
+D6)
+ALTER TABLE pracownik ADD COLUMN pensja float(7, 5);
+UPDATE pracownik SET pensja = 0.00003;
+
+D7)
+ALTER TABLE dzial CHANGE nazwa nazwa_dzialu varchar(255);
+
+D8)
+DELETE FROM pracownik ORDER BY id DESC LIMIT 1;
+
+D9)
+ALTER TABLE pracownik ADD COLUMN dzial INT;
+ALTER TABLE pracownik ADD CONSTRAINT fk_dzial FOREIGN KEY (dzial) REFERENCES dzial(id);
+
+UPDATE pracownik SET dzial = 2 WHERE stanowisko = 'ksiegowa';
+
+D10)
+CREATE TABLE stanowisko(id_stanowiska INT PRIMARY KEY, nazwa_stanowiska VARCHAR(255));
+
+D11)
+INSERT INTO stanowisko VALUES(1, 'sprzedawca');
+INSERT INTO stanowisko VALUES(2, 'ksiegowa');
+INSERT INTO stanowisko VALUES(3, 'magazynier');
+
+ALTER TABLE pracownik MODIFY COLUMN stanowisko INT;
+ALTER TABLE pracownik ADD CONSTRAINT fk_stanowisko FOREIGN KEY (stanowisko) REFERENCES stanowisko(id_stanowiska);
+UPDATE pracownik SET stanowisko = 2 WHERE nazwisko = 'Test';
+
+D12)
+ALTER TABLE pracownik DROP CONSTRAINT fk_stanowisko;
+ALTER TABLE pracownik ADD CONSTRAINT fk_stanowisko FOREIGN KEY (stanowisko) REFERENCES stanowisko(id_stanowiska)
+ON DELETE SET NULL;
